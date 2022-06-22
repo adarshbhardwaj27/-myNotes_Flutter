@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mynotes/constants/routes.dart';
+import 'dart:developer' as devtools show log;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -39,14 +41,15 @@ class _RegisterViewState extends State<RegisterView> {
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(hintText: 'Enter your email here'),
+            decoration:
+                const InputDecoration(hintText: 'Enter your email here'),
           ),
           TextField(
             controller: _password,
             obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
-            decoration: InputDecoration(hintText: 'Enter password here'),
+            decoration: const InputDecoration(hintText: 'Enter password here'),
           ),
           TextButton(
               onPressed: () async {
@@ -56,18 +59,18 @@ class _RegisterViewState extends State<RegisterView> {
                   final userCredential = FirebaseAuth.instance
                       .createUserWithEmailAndPassword(
                           email: email, password: password);
-                  print(userCredential);
+                  devtools.log(userCredential.toString());
                 } on FirebaseAuthException catch (e) {
-                  print(e.code);
+                  devtools.log(e.code);
                 }
               },
               child: const Text('Register')),
           TextButton(
             onPressed: () {
               Navigator.of(context)
-                  .pushNamedAndRemoveUntil('/login/', (route) => false);
+                  .pushNamedAndRemoveUntil(loginRoute, (route) => false);
             },
-            child: Text('Aldready registered? Login Here!'),
+            child: const Text('Aldready registered? Login Here!'),
           )
         ],
       ),
