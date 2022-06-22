@@ -46,13 +46,13 @@ class HomePage extends StatelessWidget {
             } else {
               return const LoginView();
             }
-            // FirebaseAuth.instance.currentUser?.reload();
-            // print(user);
-            // if (user?.emailVerified ?? false) {
-            // } else {
-            //   return const VerifyEmailView();
-            // }
-            return const Text('Done');
+          // FirebaseAuth.instance.currentUser?.reload();
+          // print(user);
+          // if (user?.emailVerified ?? false) {
+          // } else {
+          //   return const VerifyEmailView();
+          // }
+
           default:
             return const CircularProgressIndicator();
         }
@@ -78,8 +78,19 @@ class _NotesViewState extends State<NotesView> {
         title: const Text('Main UI'),
         actions: [
           PopupMenuButton<MenuAction>(
-            onSelected: (value) {
-              devtools.log(value.toString());
+            onSelected: (value) async {
+              switch (value) {
+                case MenuAction.logout:
+                  final shouldLogout = await showLogOutDialog(context);
+                  if (shouldLogout) {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/login/', (_) => false);
+                    devtools.log(FirebaseAuth.instance.currentUser.toString());
+                  }
+
+                  break;
+              }
             },
             itemBuilder: (context) {
               return const [
@@ -98,7 +109,7 @@ class _NotesViewState extends State<NotesView> {
 }
 
 Future<bool> showLogOutDialog(BuildContext context) {
-  showDialog<bool>(
+  return showDialog<bool>(
     context: context,
     builder: (context) {
       return AlertDialog(
