@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/enums/menu_action.dart';
@@ -23,12 +25,6 @@ class _NotesViewState extends State<NotesView> {
   }
 
   @override
-  void dispose() {
-    _notesService.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -50,7 +46,6 @@ class _NotesViewState extends State<NotesView> {
                       Navigator.of(context)
                           .pushNamedAndRemoveUntil(loginRoute, (_) => false);
                     }
-
                     break;
                 }
               },
@@ -76,7 +71,25 @@ class _NotesViewState extends State<NotesView> {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                       case ConnectionState.active:
-                        return const Text("Waiting for all notes");
+                        if (snapshot.hasData) {
+                          final allNotes = snapshot.data as List<DatabaseNote>;
+                          return ListView.builder(
+                            itemCount: allNotes.length,
+                            itemBuilder: (context, index) {
+                              final note = allNotes[index];
+                              return ListTile(
+                                title: Text(
+                                  note.text,
+                                  maxLines: 1,
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
                       default:
                         return const CircularProgressIndicator();
                     }
